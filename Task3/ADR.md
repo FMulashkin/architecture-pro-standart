@@ -1,9 +1,9 @@
 ### <a name="_b7urdng99y53"></a>**Название задачи:
 ** Концептуальная архитектура MVP по открытию депозитов через сайт и интернет-банк
 
-### <a name="_hjk0fkfyohdk"></a>**Автор:** GigaCode
+### <a name="_hjk0fkfyohdk"></a>**Автор:** ---
 
-### <a name="_uanumrh8zrui"></a>**Дата:** 2025-04-05
+### <a name="_uanumrh8zrui"></a>**Дата:** 15.02.2026
 
 ### <a name="_3bfxc9a45514"></a>**Функциональные требования**
 
@@ -46,7 +46,7 @@
 
 #### 📌 Диаграмма 1: C4 Level 1 — Context Diagram
 
-**Файл:** `diagrams/c4_context_deposit_mvp.png`
+**Файл:** `Context.puml`
 
 На диаграмме отображены:
 
@@ -67,7 +67,7 @@
 
 #### 📌 Диаграмма 2: C4 Level 2 — Container Diagram
 
-**Файл:** `diagrams/c4_container_deposit_mvp.png`
+**Файл:** `Container.puml`
 
 Детализированы:
 

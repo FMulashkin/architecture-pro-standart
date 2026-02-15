@@ -2,9 +2,9 @@
 
 Расширение доступа к ставкам по депозитам для внутреннего и партнёрского кол-центров
 
-### <a name="_hjk0fkfyohdk"></a>**Автор:** GigaCode
+### <a name="_hjk0fkfyohdk"></a>**Автор:** ---
 
-### <a name="_uanumrh8zrui"></a>**Дата:** 2025-04-06
+### <a name="_uanumrh8zrui"></a>**Дата:** 15.02.2026
 
 ### <a name="_3bfxc9a45514"></a>**Функциональные требования**
 
@@ -33,7 +33,7 @@
 
 #### 📌 Диаграмма 1: C4 Level 1 — Context Diagram
 
-**Файл:** `diagrams/c4_context_rates_distribution.png`
+**Файл:** `Context.puml`
 
 На диаграмме показаны:
 
@@ -54,6 +54,4 @@
 
 #### 📌 Диаграмма 2: C4 Level 2 — Container Diagram
 
-**Файл:** `diagrams/c4_container_rates_distribution.puml`
-
-Детализирована **система управления ставками**:
+**Файл:** `Container.puml`
