@@ -1,0 +1,45 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+' =============== АКТОРЫ ===============
+Person(клиент, "Клиент", "Пользуется интернет-банком")
+Person(сотрудник_бэк_офиса, "Сотрудник бэк-офиса", "Работает в CRM")
+
+' =============== ГРАНИЦЫ СИСТЕМ ===============
+System_Boundary(интернет_банк_граница, "Интернет-банк") {
+    Container(iBank_ui, "Web/Mobile UI", "React", "Интерфейс подачи заявки")
+    Container(iBank_bff, "BFF", "Java/.NET", "API для клиента, аутентификация")
+    Container(iBank_adapter, "Кредитный адаптер", "Spring Boot", "Вызов внешних сервисов")
+}
+
+System_Boundary(кредитный_сервис_граница, "Кредитный процессинговый сервис") {
+    Container(credit_orchestrator, "Оркестратор", "Java/Python", "Управляет потоком: скоринг → решение → АБС")
+    Container(credit_queue, "Очередь заявок", "Kafka", "Буферизация и надёжная доставка")
+    Container(credit_db, "БД заявок", "MS SQL", "Хранение статусов, истории")
+}
+
+' =============== ВНЕШНИЕ СИСТЕМЫ ===============
+System(система_скоринга, "Система скоринга", "Внешняя или внутренняя система")
+System(crm_бэк_офиса, "CRM бэк-офиса", "Веб-система обработки заявок")
+System(абс, "АБС", "Core Banking System")
+System(sms_шлюз, "SMS-шлюз", "Шлюз уведомлений")
+
+' =============== СВЯЗИ ===============
+Rel(клиент, iBank_ui, "HTTPS")
+Rel(iBank_ui, iBank_bff, "API-вызовы", "HTTPS")
+Rel(iBank_bff, iBank_adapter, "Делегирование")
+
+Rel(iBank_adapter, credit_orchestrator, "POST /applications", "HTTPS")
+Rel(credit_orchestrator, credit_queue, "Ставит в очередь", "Kafka Producer")
+Rel(credit_queue, credit_orchestrator, "Потребляет сообщение", "Kafka Consumer")
+
+Rel(credit_orchestrator, система_скоринга, "GET /score", "HTTPS")
+Rel(credit_orchestrator, crm_бэк_офиса, "Направляет заявку", "REST")
+Rel(credit_orchestrator, абс, "POST /open-loan", "HTTPS")
+Rel(credit_orchestrator, sms_шлюз, "Отправляет результат", "HTTPS")
+
+Rel(сотрудник_бэк_офиса, crm_бэк_офиса, "Работает с интерфейсом")
+
+' Подпись
+Footer C4 Level 2: Архитектура онлайн-кредита | MVP + Расширение | 2026
+@enduml

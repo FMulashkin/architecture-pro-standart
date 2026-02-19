@@ -1,0 +1,66 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+' =============== КОНТЕЙНЕРЫ ===============
+Person(клиент_новый, "Новый клиент")
+Person(клиент_зарегистрированный, "Зарегистрированный клиент")
+Person(сотрудник_бэк_офиса, "Сотрудник бэк-офиса")
+
+System_Boundary(сайт_граница, "Сайт банка") {
+    Container(сайт_ui, "Web UI", "HTML, CSS, JS", "Интерфейс для просмотра депозитов и подачи заявок")
+    Container(сайт_api, "Backend API", "Node.js / Java", "Обработка заявок, вызов систем")
+}
+
+System_Boundary(интернет_банк_граница, "Интернет-банк") {
+    Container(iBank_ui, "Web/Mobile UI", "React / Angular", "Клиентский интерфейс")
+    Container(iBank_bff, "BFF (Backend for Frontend)", "Java/.NET", "API для клиента, аутентификация")
+    Container(iBank_auth, "Служба аутентификации", "OAuth2/OpenID Connect", "Проверка сессии")
+    Container(iBank_adapter, "Интеграционный адаптер", "Spring Boot / .NET Core", "Вызов ставок, SMS, очередей")
+}
+
+System_Boundary(промежуточная_система, "Промежуточный слой") {
+    Container(deposit_service, "Deposit Processing Service", "Java/Python", "Приём и маршрутизация заявок")
+    ContainerDb(очередь, "Kafka", "Apache Kafka", "Шина событий: очередь заявок")
+}
+
+System_Boundary(бэк_офис_граница, "Бэк-офис") {
+    Container(система_управления_ставками, "Система управления ставками", "Web App", "Редактирование ставок (вместо XLS)")
+    ContainerDb(бд_ставки, "БД ставок", "MS SQL / Oracle", "Хранение ставок и правил")
+}
+
+System_Boundary(абс_граница, "АБС") {
+    Container(абс_engine, "Core Banking Engine", "COBOL / Java", "Логика открытия депозитов")
+    Container(абс_gateway, "API Gateway", "REST/SOAP", "Входная точка для внешних систем")
+    ContainerDb(абс_db, "БД АБС", "Oracle", "Хранение клиентов, счетов, депозитов")
+}
+
+Container(sms_шлюз, "SMS-шлюз", "Внешняя система", "Отправка SMS-кодов и уведомлений")
+
+' =============== СВЯЗИ ===============
+Rel(клиент_новый, сайт_ui, "HTTPS")
+Rel(сайт_ui, сайт_api, "Вызов API", "HTTPS")
+Rel(сайт_api, система_управления_ставками, "GET /rates", "HTTPS")
+Rel(сайт_api, система_кол_центра, "POST /application", "HTTPS")
+
+Rel(клиент_зарегистрированный, iBank_ui, "HTTPS")
+Rel(iBank_ui, iBank_bff, "API-вызовы", "HTTPS")
+Rel(iBank_bff, iBank_auth, "Проверка токена", "JWT/OAuth2")
+Rel(iBank_bff, iBank_adapter, "Делегирование операций")
+
+Rel(iBank_adapter, система_управления_ставками, "GET /personal-rates", "HTTPS")
+Rel(iBank_adapter, sms_шлюз, "Отправка SMS-кода", "HTTPS")
+Rel(iBank_adapter, очередь, "Отправка заявки", "Kafka Producer")
+
+Rel(очередь, deposit_service, "Потребление сообщения", "Kafka Consumer")
+Rel(deposit_service, абс_gateway, "Подтверждение заявки", "REST/HTTPS")
+Rel(deposit_service, сотрудник_бэк_офиса, "Задача в CRM", "WebSocket / API")
+
+Rel(сотрудник_бэк_офиса, система_управления_ставками, "Редактирование", "HTTPS")
+Rel(система_управления_ставками, бд_ставки, "JDBC/ODBC")
+
+Rel(абс_gateway, абс_engine, "Вызов ядра")
+Rel(абс_engine, абс_db, "DML")
+
+' Подпись
+Footer C4 Level 2: Архитектура контейнеров | MVP "Открытие депозита" | 2026
+@enduml
